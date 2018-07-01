@@ -1,0 +1,23 @@
+
+###> symfony/framework-bundle ###
+/.env
+/public/bundles/
+/var/
+/vendor/
+/config/
+/bin/
+/public/
+/tests/
+/.idea/
+/composer.lock
+/symfony.lock
+/env.dist
+/tests/
+/phpunit.xml.dist
+/env.dist
+###< symfony/framework-bundle ###
+
+###> symfony/phpunit-bridge ###
+.phpunit
+/phpunit.xml
+###< symfony/phpunit-bridge ###
