@@ -58,9 +58,27 @@ class CoinbaseHandler
         try{
             $this->commerceClient = new CommerceClient($apikey, $version, $webhooksecret);
 
-        }catch (\SoapFault $e) {
+        }catch (\Exception $e) {
             var_dump($e->getMessage());
         }
+    }
+
+    /**
+     * @param $input
+     * @return Charge|null
+     */
+    public function createNewCharge($input){
+
+        $charge = null;
+
+        try{
+            $jsonString = $this->commerceClient->createNewCharge($input);
+            $charge = $this->parseCharge($jsonString);
+        }catch (\Exception $e) {
+            var_dump($e->getMessage());
+        }
+
+        return $charge;
     }
 
     /**
