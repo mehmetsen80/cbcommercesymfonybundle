@@ -37,7 +37,7 @@ class CoinbaseCommerceExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        // we now have these 2 config keys
+        // we now have these 3 config keys
         // $config['api']['key'], $config['api']['version'] and $config['webhook']['secret']
 
         $definition = $container->getDefinition('coinbase.commerce.client');
