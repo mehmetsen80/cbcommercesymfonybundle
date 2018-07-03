@@ -66,12 +66,26 @@ class CoinbaseHandler
     /**
      * @param $input
      * @return Charge|null
+     * @throws \Exception
      */
     public function createNewCharge($input){
 
         $charge = null;
 
+        //if input is an instance of Charge object
+        //let's convert the Charge instance to json array
+        if(is_object($input) && $input instanceof Charge){
+            $json = json_encode($input);
+            $input = json_decode($json,true);
+        }else if(is_string($input) && is_array(json_decode($input, true))){//if json string, then convert it into json array
+            $input = json_decode($input, true);
+        }
+
+        //if the input is still not an array then return null
+        if(!is_array($input)) return null;
+
         try{
+            //we only accept json array
             $jsonString = $this->commerceClient->createNewCharge($input);
             $charge = $this->parseCharge($jsonString);
         }catch (\Exception $e) {
@@ -146,7 +160,7 @@ class CoinbaseHandler
          * @var Charge $charge
          */
         $charge = Castable::cast(new Charge(), $json);
-        $charge->setJson($jsonArray);
+        $charge->setRawJson($jsonArray);
 
         /**
          * 2-)
@@ -282,9 +296,7 @@ class CoinbaseHandler
      */
     public function parseCharges($jsonString): Charges {
 
-
         $json = json_decode($jsonString);
-        $jsonArray = json_decode($jsonString, true);
 
         //do nothing if nil
         if(is_null($json)) return null;

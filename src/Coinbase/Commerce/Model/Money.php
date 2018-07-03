@@ -9,13 +9,13 @@
 namespace App\Coinbase\Commerce\Model;
 
 
-class Money
+class Money implements \JsonSerializable
 {
     /** @var float */
-    protected $amount;
+    public $amount;
 
     /** @var  string */
-    protected $currency;
+    public $currency;
 
     /**
      * @return float
@@ -57,4 +57,18 @@ class Money
         return "Amount: " . $this->getAmount() . ", Currency: " . $this->getCurrency();
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'amount' => $this->amount,
+            'currency' => $this->currency
+        ];
+    }
 }

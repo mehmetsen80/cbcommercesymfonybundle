@@ -9,7 +9,7 @@
 namespace App\Coinbase\Commerce\Model;
 
 
-class Pricing
+class Pricing implements \JsonSerializable
 {
     /** @var Money */
     protected $local;
@@ -106,4 +106,21 @@ class Pricing
         $this->litecoin = $litecoin;
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'local' => $this->local,
+            'ethereum' => $this->ethereum,
+            'bitcoin' => $this->bitcoin,
+            'bitcoincash' => $this->bitcoincash,
+            'litecoin' => $this->litecoin
+        ];
+    }
 }

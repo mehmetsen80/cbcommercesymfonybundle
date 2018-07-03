@@ -9,7 +9,7 @@
 namespace App\Coinbase\Commerce\Model;
 
 
-class Addresses
+class Addresses implements \JsonSerializable
 {
     /** @var string */
     protected $ethereum;
@@ -92,4 +92,20 @@ class Addresses
         return "Bitcoin: " . $this->getBitcoin() . " Bitcoincash: " . $this->getBitcoincash() . " Ethereum: " . $this->getEthereum() . " Litecoin: " . $this->getLitecoin();
     }
 
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'ethereum' => $this->ethereum,
+            'bitcoin' => $this->bitcoin,
+            'bitcoincash' => $this->bitcoincash,
+            'litecoin' => $this->litecoin
+        ];
+    }
 }

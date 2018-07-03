@@ -53,7 +53,7 @@ After you have installed the bundle, syfmony will have the following service
 
 However, the _**coinbase.commerce.client**_ is still private, so let's create the public alias
 
-Add public alias service
+Add public alias on **_[symfonyproject]/config/services.yaml_** 
 ```
 coinbase.commerce:
     alias: 'coinbase.commerce.client'
@@ -66,8 +66,10 @@ You can get the handler inside your Controller and call the functions
 
 ## Example
 
-Let's create a new charge along with $3.6 donation
+### Create new Charge
+Let's create a new charge along with $3.6 donation. The input can be json array, json string or Charge object
 
+#### CALL WITH JSON ARRAY
 ```
    /**
     * @Route("/acceptcrypto/", name="acceptcrypto")
@@ -96,14 +98,81 @@ Let's create a new charge along with $3.6 donation
     }
 ```
 
+#### CALL WITH JSON STRING
+```
+   /**
+    * @Route("/acceptcrypto/", name="acceptcrypto")
+    */
+    public function acceptDonation(){
+        
+        $json_string = "{\"name\":\"Cancer Donation Form\",\"description\":\"Donation to Children\",\"pricing_type\":\"fixed_price\",\"local_price\":{\"amount\":\"2.7\",\"currency\":\"USD\"},\"meta_data\":{\"id\":\"12345\",\"firstname\":\"Victor\",\"lastname\":\"Doe\",\"email\":\"vdoe@example.com\"}}";
+        
+        /**
+        * @var CoinbaseHandler $coinbaseHandler
+        */
+        $coinbaseHandler = $this->container->get('coinbase.commerce');
+        
+        /**
+        * @var Charge $charge
+        */
+        $charge = $coinbaseHandler->createNewCharge($json_string);//get the charge object
+
+        $this->redirect($charge->getHostedUrl());//it will redirect you to the coinbase crypto box to be paid in 15 minutes
+    }
+```
+
+#### CALL WITH CHARGE OBJECT
+```
+   /**
+    * @Route("/acceptcrypto/", name="acceptcrypto")
+    */
+    public function acceptDonation(){
+        
+        /**
+        * @var Charge $charge
+        */
+        $charge = new Charge();
+        $charge->setName("Cancer Donation Form");
+        $charge->setDescription("Donation to Children");
+        $charge->setPricingType("fixed_price");
+       
+        $localPrice = new Money();
+        $localPrice->setAmount(2.6);
+        $localPrice->setCurrency("USD");
+        $charge->setLocalPrice($localPrice);
+       
+       
+        //Whatever object fields you wanna put
+        $metadata = new Metadata();
+        $metadata->id = "1234";
+        $metadata->firstname = "Melisa";
+        $metadata->lastname = "Doe";
+        $metadata->email = "mdoe@example.com";
+        $charge->setMetadata($metadata);
+       
+        /**
+        * @var CoinbaseHandler $coinbaseHandler
+        */
+        $coinbaseHandler = $this->container->get('coinbase.commerce');
+        
+        /**
+        * @var Charge $charge
+        */
+        $charge = $coinbaseHandler->createNewCharge($charge);//get the charge object
+
+        $this->redirect($charge->getHostedUrl());//it will redirect you to the coinbase crypto box to be paid in 15 minutes
+    }
+```
+
+
 ## Charge Object
 
 Charge is one of your main object model that is re-usable once it is retrieved. It includes all other object models;
 > Addresses, Timeline, Pricing, Money etc..
 
-It includes the raw json string as well in case you need to look up the metadata. 
+It includes the raw json string as well in case you need to look up the fields manually. 
 ```
-$charge->getJson()
+$charge->getRawJson()
 ```
 
 Here is an example of a returned Charge object that is already expired. No action taken in 15 minutes
@@ -130,8 +199,8 @@ App\Coinbase\Commerce\Model\Charge Object
     [metadata:protected] => App\Coinbase\Commerce\Model\Metadata Object
         (
             [id] => 1234
-            [firstname] => Mehmet
-            [lastname] => Sen
+            [firstname] => John
+            [lastname] => Doe
             [email] => jdoe@example.com
         )
 
@@ -210,9 +279,10 @@ App\Coinbase\Commerce\Model\Charge Object
                     [hosted_url] => https://commerce.coinbase.com/charges/GR9M6MYK
                     [metadata] => Array
                         (
-                            [orderid] => 949494
-                            [customer_id] => 49489
-                            [customer_name] => Mehmet Sen
+                            [id] => 1234
+                            [firstname] => John
+                            [lastname] => Doe
+                            [email] => jdoe@example.com
                         )
 
                     [name] => Cancer Donation Box
@@ -282,9 +352,7 @@ App\Coinbase\Commerce\Model\Charge Object
 
 ## Unit Test
 
-We are ready now to unit test 
-
-Create a unit test file that extends KernelTestCase
+Let's Create a unit test file that extends KernelTestCase
 
 ```
 <?php
@@ -360,23 +428,83 @@ class TestCoinbaseCommerceSymfonySDK extends KernelTestCase
         $this->assertNotNull($this->_coinbaseHandler, "Coinbase Handler is null!!!");
     }
     
-    public function ignore_testCreateNewCharge(){
+    public function ignore_testCreateNewChargeWithJsonArray(){
     
             $amount = 3.6;//$3.6 dollars
             $json =  [
-                "name" => "Developer Donation Form",
-                "description" => "Donate to Mehmet Sen",
+                "name" => "Cancer Donation Form",
+                "description" => "Donation to Children",
                 "local_price" => array("amount" => $amount, "currency" => "USD"),
                 "pricing_type" => "fixed_price",
-                "metadata" => array("id" => "1234", "firstname" => "Mehmet", "lastname" => "Sen", "email" => "msen@na.edu")
+                "metadata" => array("id" => "123456", "firstname" => "John", "lastname" => "Doe", "email" => "jdoe@na.edu")
             ];
-            $charge = $this->_coinbaseHandler->createNewCharge($json);
-            print_r($charge);
+    
+            /**
+             * @var Charge $charge
+             */
+            try {
+                $charge = $this->_coinbaseHandler->createNewCharge($json);
+            } catch (\Exception $e) {
+                echo $e->getMessage(), EOL;
+            }
             echo "code: " . $charge->getCode(), EOL;
             echo "name: " . $charge->getName(), EOL;
             $this->assertNotNull($charge);
             $this->assertEquals("Developer Donation Form", $charge->getName());
+    
+     }
+    
+     public function ignore_testCreateNewChargeWithObject(){
+    
+            /**
+             * @var Charge $charge
+             */
+            $charge = new Charge();
+            $charge->setName("Cancer Donation Form");
+            $charge->setDescription("Donation to Children");
+            $charge->setPricingType("fixed_price");
+    
+            $localPrice = new Money();
+            $localPrice->setAmount(2.6);
+            $localPrice->setCurrency("USD");
+            $charge->setLocalPrice($localPrice);
+    
+            //Whatever object fields you wanna put
+            $metadata = new Metadata();
+            $metadata->id = "1234";
+            $metadata->firstname = "Melisa";
+            $metadata->lastname = "Doe";
+            $metadata->email = "mdoe@example.com";
+            $charge->setMetadata($metadata);
+    
+            /**
+             * @var Charge $charge
+             */
+            try {
+                $charge = $this->_coinbaseHandler->createNewCharge($charge);
+            } catch (\Exception $e) {
+                echo $e->getMessage(), EOL;
+            }
+            $this->assertNotNull($charge);
+            print_r($charge);
+        }
+    
+    public function ignore_testCreateNewChargeWithJsonString(){
+        
+            $json_string = "{\"name\":\"Cancer Donation Form\",\"description\":\"Donation to Children\",\"pricing_type\":\"fixed_price\",\"local_price\":{\"amount\":\"2.7\",\"currency\":\"USD\"},\"meta_data\":{\"id\":\"12345\",\"firstname\":\"Victor\",\"lastname\":\"Doe\",\"email\":\"vdoe@example.com\"}}";
+    
+            /**
+             * @var Charge $charge
+             */
+            try {
+                $charge = $this->_coinbaseHandler->createNewCharge($json_string);
+            } catch (\Exception $e) {
+                echo $e->getMessage(), EOL;
+            }
+            $this->assertNotNull($charge);
+            print_r($charge);
     }
+
 }
 ```
 

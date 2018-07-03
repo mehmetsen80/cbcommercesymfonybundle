@@ -11,5 +11,7 @@ namespace App\Coinbase\Commerce\Model;
 
 class Metadata
 {
-    //no need to put anything
+    public function __construct() {
+
+    }
 }

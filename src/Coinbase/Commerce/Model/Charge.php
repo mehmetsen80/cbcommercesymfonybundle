@@ -9,7 +9,7 @@
 namespace App\Coinbase\Commerce\Model;
 
 
-class Charge
+class Charge implements \JsonSerializable
 {
     /** @var string */
     protected $code;
@@ -19,6 +19,9 @@ class Charge
 
     /** @var string */
     protected $description;
+
+    /** @var Money */
+    protected $local_price;
 
     /** @var string */
     protected $hosted_url;
@@ -51,7 +54,7 @@ class Charge
     protected $payments;
 
     /** @var array */
-    protected $json;
+    protected $raw_json;
 
     /**
      * @return string
@@ -102,6 +105,22 @@ class Charge
     }
 
     /**
+     * @return Money
+     */
+    public function getLocalPrice()
+    {
+        return $this->local_price;
+    }
+
+    /**
+     * @param Money $local_price
+     */
+    public function setLocalPrice(Money $local_price)
+    {
+        $this->local_price = $local_price;
+    }
+
+    /**
      * @return string
      */
     public function getHostedUrl()
@@ -136,7 +155,7 @@ class Charge
     /**
      * @return string
      */
-    public function getExpiresAt(): string
+    public function getExpiresAt()
     {
         return $this->expires_at;
     }
@@ -264,17 +283,17 @@ class Charge
     /**
      * @return array
      */
-    public function getJson()
+    public function getRawJson(): array
     {
-        return $this->json;
+        return $this->raw_json;
     }
 
     /**
-     * @param array $json
+     * @param array $raw_json
      */
-    public function setJson(array $json)
+    public function setRawJson(array $raw_json)
     {
-        $this->json = $json;
+        $this->raw_json = $raw_json;
     }
 
     /**
@@ -284,5 +303,32 @@ class Charge
     {
         return  "Name: " . $this->getName() . ", Code:" . $this->getCode() . ", Description: " . $this->getDescription() . ", HostedUrl: " . $this->getHostedUrl() . ", CreatedAt: " . $this->getCreatedAt() .
             ", ExpiresAt: " . $this->getExpiresAt() . ", ConfirmedAt: " . $this->getConfirmedAt() . ", PricingType: " . $this->getPricingType() . ", Addresses: " . $this->getAddresses();
+    }
+
+    /**
+     * Specify data which should be serialized to JSON
+     * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+     * @return mixed data which can be serialized by <b>json_encode</b>,
+     * which is a value of any type other than a resource.
+     * @since 5.4.0
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'addresses' => $this->addresses,
+            'code'  => $this->code,
+            'created_at' => $this->created_at,
+            'expires_at' => $this->expires_at,
+            'hosted_url' => $this->hosted_url,
+            'name'  => $this->name,
+            'description'  => $this->description,
+            'local_price' => $this->local_price,
+            'metadata'  => $this->metadata,
+            'pricing'   => $this->pricing,
+            'pricing_type'  => $this->pricing_type,
+            'timeline'  => $this->timeline,
+            'payments' => $this->payments
+
+        ];
     }
 }
