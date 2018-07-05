@@ -64,6 +64,9 @@
     "extra": {
         "symfony": {
             "allow-contrib": false
+        },
+        "branch-alias": {
+            "dev-master": "v0.3-dev"
         }
     },
     "minimum-stability": "stable"
