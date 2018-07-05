@@ -32,7 +32,7 @@ coinbase_commerce:
 
 ## Installing
 
-Update your composer with the bundle library and version
+change your composer with the bundle library and version
 
 ```
 {
@@ -41,13 +41,17 @@ Update your composer with the bundle library and version
     }
 }
 ```
+then update your composer
+```
+$ composer update
+```
 
 ## Configure Service
 
 Let's check out the services
 
 ```
-php bin/console debug:container
+$ php bin/console debug:container
 ```
 
 
@@ -468,81 +472,101 @@ class TestCoinbaseCommerceSymfonySDK extends KernelTestCase
     
     public function ignore_testCreateNewChargeWithJsonArray(){
     
-            $amount = 3.6;//$3.6 dollars
-            $json =  [
-                "name" => "Cancer Donation Form",
-                "description" => "Donation to Children",
-                "local_price" => array("amount" => $amount, "currency" => "USD"),
-                "pricing_type" => "fixed_price",
-                "metadata" => array("id" => "123456", "firstname" => "John", "lastname" => "Doe", "email" => "jdoe@na.edu")
-            ];
+        $amount = 3.6;//$3.6 dollars
+        $json =  [
+            "name" => "Cancer Donation Form",
+             "description" => "Donation to Children",
+             "local_price" => array("amount" => $amount, "currency" => "USD"),
+             "pricing_type" => "fixed_price",
+             "metadata" => array("id" => "123456", "firstname" => "John", "lastname" => "Doe", "email" => "jdoe@na.edu")
+        ];
     
-            /**
-             * @var Charge $charge
-             */
-            try {
-                $charge = $this->_coinbaseHandler->createNewCharge($json);
-            } catch (\Exception $e) {
-                echo $e->getMessage(), EOL;
-            }
-            echo "code: " . $charge->getCode(), EOL;
-            echo "name: " . $charge->getName(), EOL;
-            $this->assertNotNull($charge);
-            $this->assertEquals("Cancer Donation Form", $charge->getName());
-    
-     }
-    
-     public function ignore_testCreateNewChargeWithObject(){
-    
-            /**
-             * @var Charge $charge
-             */
-            $charge = new Charge();
-            $charge->setName("Cancer Donation Form");
-            $charge->setDescription("Donation to Children");
-            $charge->setPricingType("fixed_price");
-    
-            $localPrice = new Money();
-            $localPrice->setAmount(2.6);
-            $localPrice->setCurrency("USD");
-            $charge->setLocalPrice($localPrice);
-    
-            //Whatever object fields you wanna put
-            $metadata = new Metadata();
-            $metadata->id = "1234";
-            $metadata->firstname = "Melisa";
-            $metadata->lastname = "Doe";
-            $metadata->email = "mdoe@example.com";
-            $charge->setMetadata($metadata);
-    
-            /**
-             * @var Charge $charge
-             */
-            try {
-                $charge = $this->_coinbaseHandler->createNewCharge($charge);
-            } catch (\Exception $e) {
-                echo $e->getMessage(), EOL;
-            }
-            $this->assertNotNull($charge);
-            print_r($charge);
+        /**
+        * @var Charge $charge
+        */
+        try {
+            $charge = $this->_coinbaseHandler->createNewCharge($json);
+        } catch (\Exception $e) {
+            echo $e->getMessage(), EOL;
         }
+        echo "code: " . $charge->getCode(), EOL;
+        echo "name: " . $charge->getName(), EOL;
+        $this->assertNotNull($charge);
+        $this->assertEquals("Cancer Donation Form", $charge->getName());
+    }
+    
+    public function ignore_testCreateNewChargeWithObject(){
+    
+        /**
+        * @var Charge $charge
+        */
+        $charge = new Charge();
+        $charge->setName("Cancer Donation Form");
+        $charge->setDescription("Donation to Children");
+        $charge->setPricingType("fixed_price");
+    
+        $localPrice = new Money();
+        $localPrice->setAmount(2.6);
+        $localPrice->setCurrency("USD");
+        $charge->setLocalPrice($localPrice);
+    
+        //Whatever object fields you wanna put
+        $metadata = new Metadata();
+        $metadata->id = "1234";
+        $metadata->firstname = "Melisa";
+        $metadata->lastname = "Doe";
+        $metadata->email = "mdoe@example.com";
+        $charge->setMetadata($metadata);
+    
+        /**
+        * @var Charge $charge
+        */
+        try {
+            $charge = $this->_coinbaseHandler->createNewCharge($charge);
+        } catch (\Exception $e) {
+            echo $e->getMessage(), EOL;
+        }
+        $this->assertNotNull($charge);
+        print_r($charge);
+    }
     
     public function ignore_testCreateNewChargeWithJsonString(){
         
-            $json_string = "{\"name\":\"Cancer Donation Form\",\"description\":\"Donation to Children\",\"pricing_type\":\"fixed_price\",\"local_price\":{\"amount\":\"2.7\",\"currency\":\"USD\"},\"meta_data\":{\"id\":\"12345\",\"firstname\":\"Victor\",\"lastname\":\"Doe\",\"email\":\"vdoe@example.com\"}}";
+        $json_string = "{\"name\":\"Cancer Donation Form\",\"description\":\"Donation to Children\",\"pricing_type\":\"fixed_price\",\"local_price\":{\"amount\":\"2.7\",\"currency\":\"USD\"},\"meta_data\":{\"id\":\"12345\",\"firstname\":\"Victor\",\"lastname\":\"Doe\",\"email\":\"vdoe@example.com\"}}";
     
-            /**
-             * @var Charge $charge
-             */
-            try {
-                $charge = $this->_coinbaseHandler->createNewCharge($json_string);
-            } catch (\Exception $e) {
-                echo $e->getMessage(), EOL;
-            }
-            $this->assertNotNull($charge);
-            print_r($charge);
+        /**
+        * @var Charge $charge
+        */
+        try {
+            $charge = $this->_coinbaseHandler->createNewCharge($json_string);
+        } catch (\Exception $e) {
+            echo $e->getMessage(), EOL;
+        }
+        $this->assertNotNull($charge);
+        print_r($charge);
     }
-
+    
+    public function ignore_testShowACharge(){
+        $code = "2G3GM4X9";
+        /**
+        * @var Charge $charge
+        */
+        $charge = $this->_coinbaseHandler->showCharge($code);
+        print_r($charge);
+        $this->assertNotNull($charge);
+    }
+    
+    public function ignore_testListCharges(){
+        /**
+        * @var Charges $charges
+        */
+        $charges = $this->_coinbaseHandler->listCharges();
+        print_r($charges);
+        $this->assertNotNull($charges);
+        foreach ($charges->getData() as $charge){
+           print_r($charge);
+        }
+    }
 }
 ```
 
