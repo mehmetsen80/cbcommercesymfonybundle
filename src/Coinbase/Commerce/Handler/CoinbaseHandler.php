@@ -326,6 +326,30 @@ class CoinbaseHandler
     }
 
     /**
+     * @param $code
+     * @return Charge|null
+     */
+    public function showCharge($code){
+
+        if(is_null($code) || empty($code)) return null;
+
+        $jsonString = $this->getCommerceClient()->getCharge($code);
+        $charge = $this->parseCharge($jsonString);
+        return $charge;
+    }
+
+    /**
+     * @return Charges
+     */
+    public function listCharges(){
+
+        $jsonString = $this->getCommerceClient()->getCharges();
+        $charges = $this->parseCharges($jsonString);
+        return $charges;
+
+    }
+
+    /**
      * Validate webhook signature
      *
      * @param string $cc_signature, string $secret, JSON $request

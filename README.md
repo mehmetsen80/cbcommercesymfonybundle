@@ -450,7 +450,7 @@ class TestCoinbaseCommerceSymfonySDK extends KernelTestCase
             echo "code: " . $charge->getCode(), EOL;
             echo "name: " . $charge->getName(), EOL;
             $this->assertNotNull($charge);
-            $this->assertEquals("Developer Donation Form", $charge->getName());
+            $this->assertEquals("Cancer Donation Form", $charge->getName());
     
      }
     

@@ -24,6 +24,7 @@ class CommerceClient
     const CONTENT_TYPE = "application/json";
     const URL_CHECKOUT = "https://api.commerce.coinbase.com/checkouts";
     const URL_CHARGE = "https://api.commerce.coinbase.com/charges";
+    const URL_CHARGES = "https://api.commerce.coinbase.com/charges?limit=100";
 
     const HTTP_STATUS_CODE_OK = "200";//OK
     const HTTP_STATUS_CODE_CREATED = "201";//Created
@@ -158,7 +159,7 @@ class CommerceClient
         ];
 
         try {
-            $response = $this->httpClient->request('GET', self::URL_CHARGE, $options);
+            $response = $this->httpClient->request('GET', self::URL_CHARGES, $options);
             $content = $response->getBody()->getContents();
 
             if($response->getStatusCode() == self::HTTP_STATUS_CODE_OK){
