@@ -65,6 +65,16 @@ coinbase.commerce:
 You can get the handler inside your Controller and call the functions
 
 ## Example
+### Get the Charge Handler
+Since we made the public alias, we can get it anywhere we want
+```
+/**
+* get the coinbase handler
+* @var CoinbaseHandler $coinbaseHandler
+*/
+$coinbaseHandler = $this->container->get('coinbase.commerce');
+```
+
 
 ### Create new Charge
 Let's create a new charge along with $3.6 donation. The input can be json array, json string or Charge object
@@ -164,6 +174,30 @@ Let's create a new charge along with $3.6 donation. The input can be json array,
     }
 ```
 
+## Show a Charge
+```
+$code = "2G3GM4X9";
+/**
+* get a single charge
+* @var Charge $charge
+*/
+$charge = $coinbaseHandler->showCharge($code);
+$hosted_url = $charge->getHostedUrl();
+```
+
+## List Charges
+```
+/**
+* list charges
+* @var Charges $charges
+*/
+$charges = $this->_coinbaseHandler->listCharges();
+
+//iterate through the charges
+foreach ($charges->getData() as $charge){
+    print_r($charge);
+}
+```
 
 ## Charge Object
 
