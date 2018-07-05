@@ -32,10 +32,14 @@ coinbase_commerce:
 
 ## Installing
 
-Download the bundle with your composer
+Update your composer with the bundle library and version
 
 ```
-composer require msen/coinbase-commerce-symfony-bundle
+{
+    "require": {
+        "msen/coinbase-commerce-symfony-bundle": "^0.3"
+    }
+}
 ```
 
 ## Configure Service
