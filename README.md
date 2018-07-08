@@ -614,7 +614,7 @@ When Coinbase calls your webhook endpoint, follow the below example inside your 
 ```
 
 ### Unit TEST -> Webhook
-You can unit test your Webhook by sending a sample json. The below only tests the object to be parsed or not
+You can unit test your Webhook by sending a sample json. The below only tests the json to be parsed as **_webhook_** object.
 
 ```
 public function testParseWebhook(){
@@ -718,7 +718,7 @@ public function testWebhookController(){
     }
 ```
 
-Note: When you test above your Controller, do not forget to comment out the webhook signature part inside your Controller
+Note: When you test above, do not forget to comment out the webhook signature part inside your Controller
 ```
 //if(!$coinbaseHandler->validateWebhookSignature($cc_signagure, $request)){
 //    throw new \Exception("Request could not be validated");
@@ -727,7 +727,7 @@ Note: When you test above your Controller, do not forget to comment out the webh
 
 
 
-Below is the complete code of the Unit Test of Webhook. Delete the ignore_ for each and test one by one
+Below is the complete code of the Unit Test of Webhook. Delete the **_ignore__** for each and test each function one by one
 ```
 <?php
 /**
@@ -887,4 +887,98 @@ class TestWebHook extends WebTestCase
     }
 }
 
+```
+
+### Webhook Object
+Here is an example of Webhook Object
+```
+App\Coinbase\Commerce\Model\Webhook Object
+(
+    [id:protected] => 1
+    [scheduled_for:protected] => 2017-01-31T20:50:02Z
+    [event:protected] => App\Coinbase\Commerce\Model\Event Object
+        (
+            [id:protected] => 24934862-d980-46cb-9402-43c81b0cdba6
+            [type:protected] => charge:created
+            [api_version:protected] => 2018-03-22
+            [created_at:protected] => 2017-01-31T20:49:02Z
+            [data:protected] => App\Coinbase\Commerce\Model\Charge Object
+                (
+                    [code:protected] => 66BEOV2A
+                    [name:protected] => The Sovereign Individual
+                    [description:protected] => Mastering the Transition to the Information Age
+                    [local_price:protected] => 
+                    [hosted_url:protected] => https://commerce.coinbase.com/charges/66BEOV2A
+                    [created_at:protected] => 2017-01-31T20:49:02Z
+                    [expires_at:protected] => 2017-01-31T21:04:02Z
+                    [confirmed_at:protected] => 
+                    [pricing_type:protected] => no_price
+                    [addresses:protected] => App\Coinbase\Commerce\Model\Addresses Object
+                        (
+                            [ethereum:protected] => 0x419f91df39951fd4e8acc8f1874b01c0c78ceba6
+                            [bitcoin:protected] => mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U
+                            [bitcoincash:protected] => 
+                            [litecoin:protected] => 
+                        )
+
+                    [metadata:protected] => App\Coinbase\Commerce\Model\Metadata Object
+                        (
+                        )
+
+                    [timeline:protected] => Array
+                        (
+                            [0] => App\Coinbase\Commerce\Model\Timeline Object
+                                (
+                                    [status:protected] => NEW
+                                    [time:protected] => 2017-01-31T20:49:02Z
+                                    [payment:protected] => 
+                                )
+
+                        )
+
+                    [pricing:protected] => 
+                    [payments:protected] => Array
+                        (
+                        )
+
+                    [raw_json:protected] => Array
+                        (
+                            [code] => 66BEOV2A
+                            [name] => The Sovereign Individual
+                            [description] => Mastering the Transition to the Information Age
+                            [hosted_url] => https://commerce.coinbase.com/charges/66BEOV2A
+                            [created_at] => 2017-01-31T20:49:02Z
+                            [expires_at] => 2017-01-31T21:04:02Z
+                            [timeline] => Array
+                                (
+                                    [0] => Array
+                                        (
+                                            [time] => 2017-01-31T20:49:02Z
+                                            [status] => NEW
+                                        )
+
+                                )
+
+                            [metadata] => Array
+                                (
+                                )
+
+                            [pricing_type] => no_price
+                            [payments] => Array
+                                (
+                                )
+
+                            [addresses] => Array
+                                (
+                                    [bitcoin] => mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U
+                                    [ethereum] => 0x419f91df39951fd4e8acc8f1874b01c0c78ceba6
+                                )
+
+                        )
+
+                )
+
+        )
+
+)
 ```
