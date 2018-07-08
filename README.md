@@ -32,7 +32,7 @@ coinbase_commerce:
 
 ## Installing
 
-change your composer with the bundle library and version
+edit your composer with the bundle library and version
 
 ```
 {
