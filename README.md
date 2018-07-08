@@ -607,6 +607,9 @@ When Coinbase calls your webhook endpoint, follow the below example inside your 
         $webhook = $coinbaseHandler->parseWebhook($jsonString);
         //You have your webhook object. Do Something... save webhook data to database or email people or anything useful
 
+        if($webhook->getEvent()->getType() == CoinbaseHandler::EVENT_TYPE_CREATED){
+            //Do Something
+        }
 
         return new Response('',Response::HTTP_OK, array('Content-Type' => 'text/html'));//make sure you respond with status 200 (OK) at the end
     }
