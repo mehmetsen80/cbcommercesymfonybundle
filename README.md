@@ -718,7 +718,16 @@ public function testWebhookController(){
     }
 ```
 
-Below is the complete code of the Unit Test of Webhook
+Note: When you test above your Controller, do not forget to comment out the webhook signature part inside your Controller
+```
+//if(!$coinbaseHandler->validateWebhookSignature($cc_signagure, $request)){
+//    throw new \Exception("Request could not be validated");
+//}
+```
+
+
+
+Below is the complete code of the Unit Test of Webhook. Delete the ignore_ for each and test one by one
 ```
 <?php
 /**
