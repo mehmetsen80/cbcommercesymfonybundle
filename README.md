@@ -37,7 +37,7 @@ edit your composer with the bundle library and version
 ```
 {
     "require": {
-        "msen/coinbase-commerce-symfony-bundle": "^0.4"
+        "msen/coinbase-commerce-symfony-bundle": "^0.5"
     }
 }
 ```
