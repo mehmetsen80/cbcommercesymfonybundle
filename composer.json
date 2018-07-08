@@ -26,6 +26,7 @@
         "symfony/yaml": "^4.1"
     },
     "require-dev": {
+        "symfony/browser-kit": "^4.1",
         "symfony/dotenv": "^4.1",
         "symfony/phpunit-bridge": "^4.1"
     },
@@ -66,7 +67,7 @@
             "allow-contrib": false
         },
         "branch-alias": {
-            "dev-master": "v0.3-dev"
+            "dev-master": "v0.4-dev"
         }
     },
     "minimum-stability": "stable"

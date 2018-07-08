@@ -37,7 +37,7 @@ change your composer with the bundle library and version
 ```
 {
     "require": {
-        "msen/coinbase-commerce-symfony-bundle": "^0.3"
+        "msen/coinbase-commerce-symfony-bundle": "^0.4"
     }
 }
 ```
@@ -391,8 +391,7 @@ App\Coinbase\Commerce\Model\Charge Object
 
 ```
 
-
-## Unit Test
+## Unit Test -> Charge
 
 Let's Create a unit test file that extends KernelTestCase
 
@@ -570,3 +569,313 @@ class TestCoinbaseCommerceSymfonySDK extends KernelTestCase
 }
 ```
 
+### Webhook
+To retrieve a Webhook object from a json string, use the method below, just so simple!
+
+```
+/** @var Webhook $webhook */
+$webhook = $this->_coinbaseHandler->parseWebhook($jsonString);
+```
+
+When Coinbase calls your webhook endpoint, follow the below example inside your controller
+
+```
+    /**
+    * @Route("/webhooks/", name="webhooks")
+    * @throws \Exception
+    */
+    public function webHook(Request $request){
+
+        if ($request->getMethod() != 'POST') {
+            return new Response( 'Only post requests accepted!',  400);
+        }
+
+        $jsonString = $request->getContent();//get the json string from the request
+
+        /**
+         * @var CoinbaseHandler $coinbaseHandler
+         */
+        $coinbaseHandler = $this->container->get('coinbase.commerce');
+
+        // This header contains the SHA256 HMAC signature of the raw request payload
+        $cc_signagure = isset($_SERVER["HTTP_X_CC_WEBHOOK_SIGNATURE"]) ? $_SERVER["HTTP_X_CC_WEBHOOK_SIGNATURE"] : '';
+        if(!$coinbaseHandler->validateWebhookSignature($cc_signagure, $request)){
+                throw new \Exception("Request could not be validated");
+        }
+        
+        /** @var Webhook $webhook */
+        $webhook = $coinbaseHandler->parseWebhook($jsonString);
+        //You have your webhook object. Do Something... save webhook data to database or email people or anything useful
+
+
+        return new Response('',Response::HTTP_OK, array('Content-Type' => 'text/html'));//make sure you respond with status 200 (OK) at the end
+    }
+
+```
+
+### Unit TEST -> Webhook
+You can unit test your Webhook by sending a sample json. The below only tests the object to be parsed or not
+
+```
+public function testParseWebhook(){
+
+        $jsonString = "{
+             \"id\": 1,
+             \"scheduled_for\": \"2017-01-31T20:50:02Z\",
+             \"event\": {
+                    \"id\": \"24934862-d980-46cb-9402-43c81b0cdba6\",
+                    \"type\": \"charge:created\",
+                    \"api_version\": \"2018-03-22\",
+                    \"created_at\": \"2017-01-31T20:49:02Z\",
+                    \"data\": {
+                    \"code\": \"66BEOV2A\",
+                    \"name\": \"The Sovereign Individual\",
+                    \"description\": \"Mastering the Transition to the Information Age\",
+                    \"hosted_url\": \"https://commerce.coinbase.com/charges/66BEOV2A\",
+                    \"created_at\": \"2017-01-31T20:49:02Z\",
+                    \"expires_at\": \"2017-01-31T21:04:02Z\",
+                    \"timeline\": [
+                       {
+                          \"time\": \"2017-01-31T20:49:02Z\",
+                                \"status\": \"NEW\"
+                       }
+                    ],
+                    \"metadata\": {},
+                        \"pricing_type\": \"no_price\",
+                        \"payments\": [],
+                        \"addresses\": {
+                            \"bitcoin\": \"mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U\",
+                            \"ethereum\": \"0x419f91df39951fd4e8acc8f1874b01c0c78ceba6\"
+                        }
+                    }
+                  }
+               }";
+
+
+        /** @var Webhook $webhook */
+        $webhook = $this->_coinbaseHandler->parseWebhook($jsonString);
+        $this->assertNotNull($webhook);
+        print_r($webhook);
+    }
+```
+
+Or you can even unit test your Controller. Remember from above that your controller has still /webhooks/ end point
+
+```
+public function testWebhookController(){
+
+
+        $jsonString = "{
+                    \"id\": 1,
+                    \"scheduled_for\": \"2017-01-31T20:50:02Z\",
+                    \"event\": {
+                        \"id\": \"24934862-d980-46cb-9402-43c81b0cdba6\",
+                        \"type\": \"charge:created\",
+                        \"api_version\": \"2018-03-22\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"data\": {
+                        \"code\": \"66BEOV2A\",
+                        \"name\": \"The Sovereign Individual\",
+                        \"description\": \"Mastering the Transition to the Information Age\",
+                        \"hosted_url\": \"https://commerce.coinbase.com/charges/66BEOV2A\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"expires_at\": \"2017-01-31T21:04:02Z\",
+                        \"timeline\": [
+                            {
+                                \"time\": \"2017-01-31T20:49:02Z\",
+                                \"status\": \"NEW\"
+                            }
+                         ],
+                        \"metadata\": {},
+                        \"pricing_type\": \"no_price\",
+                        \"payments\": [],
+                        \"addresses\": {
+                            \"bitcoin\": \"mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U\",
+                            \"ethereum\": \"0x419f91df39951fd4e8acc8f1874b01c0c78ceba6\"
+                        }
+                    }
+                   }
+               }";
+
+        $json_array = json_decode($jsonString, true);
+
+
+        $client = static::createClient();
+        $client->request('POST', '/webhooks/',
+            $json_array, //parameters
+            array(), //files
+            array( //server
+                'CONTENT_TYPE' => 'application/json'
+            ),
+            $jsonString
+        );
+
+        $content = $client->getResponse();
+        print_r($content);
+        $json = json_decode($content);
+        print_r($json);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+```
+
+Below is the complete code of the Unit Test of Webhook
+```
+<?php
+/**
+ * Created by PhpStorm.
+ * User: msen
+ * Date: 7/8/18
+ * Time: 3:17 PM
+ */
+
+namespace App\Coinbase\Commerce\Tests;
+
+use App\Coinbase\Commerce\Handler\CoinbaseHandler;
+use App\Coinbase\Commerce\Model\Webhook;
+use Doctrine\ORM\EntityManager;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\DependencyInjection\Container;
+
+define('EOL',(PHP_SAPI == 'cli') ? PHP_EOL : '<br />');
+
+class TestWebHook extends WebTestCase
+{
+    /**
+     * @var Container
+     */
+    protected $_container;
+
+    /**
+     * @var EntityManager
+     */
+    protected $_entityManager;
+
+    /**
+     * @var CoinbaseHandler
+     */
+    protected $_coinbaseHandler;
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function setUp()
+    {
+        try {
+
+            $kernel = self::bootKernel();
+            $this->_container = $kernel->getContainer();
+
+            /** @var EntityManager entityManager */
+            $this->_entityManager = $this->_container
+                ->get("doctrine")->getManager();
+
+            /**
+             * @var CoinbaseHandler
+             */
+            $this->_coinbaseHandler = $this->_container->get('coinbase.commerce');
+            //print_r($this->_coinbaseHandler);
+
+        } catch (\Exception $e) {
+            echo $e->getMessage(), EOL;
+        }
+    }
+
+
+    public function ignore_testParseWebhook(){
+
+        $jsonString = "{
+                    \"id\": 1,
+                    \"scheduled_for\": \"2017-01-31T20:50:02Z\",
+                    \"event\": {
+                        \"id\": \"24934862-d980-46cb-9402-43c81b0cdba6\",
+                        \"type\": \"charge:created\",
+                        \"api_version\": \"2018-03-22\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"data\": {
+                        \"code\": \"66BEOV2A\",
+                        \"name\": \"The Sovereign Individual\",
+                        \"description\": \"Mastering the Transition to the Information Age\",
+                        \"hosted_url\": \"https://commerce.coinbase.com/charges/66BEOV2A\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"expires_at\": \"2017-01-31T21:04:02Z\",
+                        \"timeline\": [
+                            {
+                                \"time\": \"2017-01-31T20:49:02Z\",
+                                \"status\": \"NEW\"
+                            }
+                         ],
+                        \"metadata\": {},
+                        \"pricing_type\": \"no_price\",
+                        \"payments\": [],
+                        \"addresses\": {
+                            \"bitcoin\": \"mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U\",
+                            \"ethereum\": \"0x419f91df39951fd4e8acc8f1874b01c0c78ceba6\"
+                        }
+                    }
+                   }
+               }";
+
+
+        /** @var Webhook $webhook */
+        $webhook = $this->_coinbaseHandler->parseWebhook($jsonString);
+        $this->assertNotNull($webhook);
+        print_r($webhook);
+    }
+
+    public function ignore_testWebhookController(){
+
+
+        $jsonString = "{
+                    \"id\": 1,
+                    \"scheduled_for\": \"2017-01-31T20:50:02Z\",
+                    \"event\": {
+                        \"id\": \"24934862-d980-46cb-9402-43c81b0cdba6\",
+                        \"type\": \"charge:created\",
+                        \"api_version\": \"2018-03-22\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"data\": {
+                        \"code\": \"66BEOV2A\",
+                        \"name\": \"The Sovereign Individual\",
+                        \"description\": \"Mastering the Transition to the Information Age\",
+                        \"hosted_url\": \"https://commerce.coinbase.com/charges/66BEOV2A\",
+                        \"created_at\": \"2017-01-31T20:49:02Z\",
+                        \"expires_at\": \"2017-01-31T21:04:02Z\",
+                        \"timeline\": [
+                            {
+                                \"time\": \"2017-01-31T20:49:02Z\",
+                                \"status\": \"NEW\"
+                            }
+                         ],
+                        \"metadata\": {},
+                        \"pricing_type\": \"no_price\",
+                        \"payments\": [],
+                        \"addresses\": {
+                            \"bitcoin\": \"mymZkiXhQNd6VWWG7VGSVdDX9bKmviti3U\",
+                            \"ethereum\": \"0x419f91df39951fd4e8acc8f1874b01c0c78ceba6\"
+                        }
+                    }
+                   }
+               }";
+
+        $json_array = json_decode($jsonString, true);
+
+
+        $client = static::createClient();
+        $client->request('POST', '/webhooks/',
+            $json_array, //parameters
+            array(), //files
+            array( //server
+                'CONTENT_TYPE' => 'application/json'
+            ),
+            $jsonString
+        );
+
+        $content = $client->getResponse();
+        print_r($content);
+        $json = json_decode($content);
+        print_r($json);
+        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+    }
+}
+
+```

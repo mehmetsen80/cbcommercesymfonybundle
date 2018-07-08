@@ -75,8 +75,8 @@ class CoinbaseHandler
         //if input is an instance of Charge object
         //let's convert the Charge instance to json array
         if(is_object($input) && $input instanceof Charge){
-            $json = json_encode($input);
-            $input = json_decode($json,true);
+            $json = json_encode($input);//first convert into json
+            $input = json_decode($json,true);//then convert into json array
         }else if(is_string($input) && is_array(json_decode($input, true))){//if json string, then convert it into json array
             $input = json_decode($input, true);
         }
