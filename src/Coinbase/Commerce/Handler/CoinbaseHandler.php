@@ -35,20 +35,6 @@ class CoinbaseHandler
      */
     protected $commerceClient;
 
-    /**
-     * @var string
-     */
-    const EVENT_TYPE_CREATED = 'charge:created';
-
-    /**
-     * @var string
-     */
-    const EVENT_TYPE_CONFIRMED = 'charge:confirmed';
-
-    /**
-     * @var string
-     */
-    const EVENT_TYPE_FAILED = 'charge:failed';
 
     /**
      * CoinbaseHandler constructor.
@@ -204,31 +190,31 @@ class CoinbaseHandler
              */
             $pricing = Castable::cast(new Pricing(), $json->pricing);
             //local
-            if(property_exists($pricing, 'local')){
+            if(property_exists($json->pricing, 'local')){
                 /** @var Money $moneyLocal */
                 $moneyLocal = Castable::cast(new Money(), $json->pricing->local);
                 $pricing->setLocal($moneyLocal);
             }
             //ethereum
-            if(property_exists($pricing, 'ethereum')){
+            if(property_exists($json->pricing, 'ethereum')){
                 /** @var Money $moneyEthereum */
                 $moneyEthereum = Castable::cast(new Money(), $json->pricing->ethereum);
                 $pricing->setEthereum($moneyEthereum);
             }
             //bitcoin
-            if(property_exists($pricing, 'bitcoin')){
+            if(property_exists($json->pricing, 'bitcoin')){
                 /** @var Money $moneyBitcoin */
                 $moneyBitcoin = Castable::cast(new Money(), $json->pricing->bitcoin);
                 $pricing->setBitcoin($moneyBitcoin);
             }
             //bitcoincash
-            if(property_exists($pricing, 'bitcoincash')){
+            if(property_exists($json->pricing, 'bitcoincash')){
                 /** @var Money $moneyBitcoincash */
                 $moneyBitcoincash = Castable::cast(new Money(), $json->pricing->bitcoincash);
                 $pricing->setBitcoincash($moneyBitcoincash);
             }
             //litecoin
-            if(property_exists($pricing, 'litecoin')){
+            if(property_exists($json->pricing, 'litecoin')){
                 /** @var Money $moneyLitecoin */
                 $moneyLitecoin = Castable::cast(new Money(), $json->pricing->litecoin);
                 $pricing->setLitecoin($moneyLitecoin);

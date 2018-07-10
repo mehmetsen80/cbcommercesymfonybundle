@@ -67,7 +67,7 @@
             "allow-contrib": false
         },
         "branch-alias": {
-            "dev-master": "v0.5-dev"
+            "dev-master": "v0.6-dev"
         }
     },
     "minimum-stability": "stable"

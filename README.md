@@ -37,7 +37,7 @@ edit your composer with the bundle library and version
 ```
 {
     "require": {
-        "msen/coinbase-commerce-symfony-bundle": "^0.5"
+        "msen/coinbase-commerce-symfony-bundle": "^0.6"
     }
 }
 ```
@@ -607,7 +607,7 @@ When Coinbase calls your webhook endpoint, follow the below example inside your 
         $webhook = $coinbaseHandler->parseWebhook($jsonString);
         //You have your webhook object. Do Something... save webhook data to database or email people or anything useful
 
-        if($webhook->getEvent()->getType() == CoinbaseHandler::EVENT_TYPE_CREATED){
+        if($webhook->getEvent()->getType() == Event::TYPE_CHARGE_CREATED){
             //Do Something
         }
 
@@ -985,3 +985,7 @@ App\Coinbase\Commerce\Model\Webhook Object
 
 )
 ```
+
+## TO DO: 
+> Events,
+> Checkout

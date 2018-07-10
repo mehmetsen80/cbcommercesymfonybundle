@@ -26,8 +26,20 @@ class Event implements \JsonSerializable
     /** @var Charge */
     protected $data;
 
+    /**
+     * @var string
+     */
+    const TYPE_CHARGE_CREATED = 'charge:created';
 
+    /**
+     * @var string
+     */
+    const TYPE_CHARGE_CONFIRMED = 'charge:confirmed';
 
+    /**
+     * @var string
+     */
+    const TYPE_CHARGE_FAILED = 'charge:failed';
 
     /**
      * @return string
