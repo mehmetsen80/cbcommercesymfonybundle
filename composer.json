@@ -22,7 +22,6 @@
         "symfony/debug": "^4.1",
         "symfony/flex": "^1.0",
         "symfony/framework-bundle": "^4.1",
-        "symfony/lts": "^4@dev",
         "symfony/yaml": "^4.1"
     },
     "require-dev": {
@@ -67,7 +66,7 @@
             "allow-contrib": false
         },
         "branch-alias": {
-            "dev-master": "v0.6-dev"
+            "dev-master": "v0.7-dev"
         }
     },
     "minimum-stability": "stable"
